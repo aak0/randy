@@ -8,6 +8,7 @@ const OAuth2Strategy = require("passport-oauth2").Strategy;
 app.use(helmet())
 app.use(express.static(path.join(__dirname, "public")));
 app.use(passport.initialize());
+app.use(passport.session());
 
 passport.use(new OAuth2Strategy({
   authorizationURL: "https://github.com/login/oauth/authorize",
@@ -23,6 +24,10 @@ passport.use(new OAuth2Strategy({
   return cb(null, {id: "abcd"});
 }
 ));
+
+passport.serializeUser((user, cb) => {
+  cb(null, user.id);
+});
 
 app.get("/login",
   passport.authenticate("oauth2"));
