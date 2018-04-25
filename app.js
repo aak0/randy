@@ -47,7 +47,6 @@ passport.deserializeUser((hash, cb) => {
   if (typeof users[hash] !== "undefined") {
     return cb(null, users[hash]);
   } else {
-    users[hash] = accessToken;
     return cb(new Error());
   }
 });
