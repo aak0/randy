@@ -54,10 +54,9 @@ passport.deserializeUser((hash, cb) => {
 app.get("/login",
   passport.authenticate("oauth2"));
 
-app.get("/repos", 
-  passport.authenticate("oauth2", { failureRedirect: "/login" }),
+app.get("/repos",
   (req, res) => {
-    res.send("Hello, authenticated user!");
+    res.json(req.user);
 });
 
 app.get("/login/callback",
