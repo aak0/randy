@@ -16,9 +16,10 @@ passport.use(new OAuth2Strategy({
   callbackURL: `${process.env.URL}/login/callback`
 },
 (accessToken, refreshToken, profile, cb) => {
-  User.findOrCreate({ exampleId: profile.id }, (err, user) => {
-    return cb(err, user);
-  });
+  // User.findOrCreate({ exampleId: profile.id }, (err, user) => {
+  //   return cb(err, user);
+  // });
+  return cb(null, {id: "abcd"});
 }
 ));
 
