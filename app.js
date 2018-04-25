@@ -4,11 +4,14 @@ const path = require("path");
 const helmet = require("helmet");
 const passport = require("passport");
 const OAuth2Strategy = require("passport-oauth2").Strategy;
+const crypto = require("crypto");
 
 app.use(helmet())
 app.use(express.static(path.join(__dirname, "public")));
 app.use(passport.initialize());
 app.use(passport.session());
+
+let users = new Map();
 
 passport.use(new OAuth2Strategy({
   authorizationURL: "https://github.com/login/oauth/authorize",
@@ -18,26 +21,38 @@ passport.use(new OAuth2Strategy({
   callbackURL: `${process.env.URL}login/callback`
 },
 (accessToken, refreshToken, profile, cb) => {
-  // User.findOrCreate({ exampleId: profile.id }, (err, user) => {
-  //   return cb(err, user);
-  // });
-  console.log(JSON.stringify(profile));
-  return cb(null, {id: profile.id});
+  const hash = crypto.createHash("sha256").update(accessToken).digest("base64");
+  console.log(hash);
+  if (users[hash] !== "undefined") {
+    return cb(null, users[hash]);
+  } else {
+    users[hash] = accessToken;
+    return cb(null, accessToken);
+  }
 }
 ));
 
-passport.serializeUser((user, cb) => {
-  cb(null, user.id);
+passport.serializeUser((accessToken, cb) => {
+  cb(null, crypto.createHash("sha256").update(accessToken).digest("base64"));
+});
+
+passport.deserializeUser((id, done) => {
+  if (users[hash] !== "undefined") {
+    return cb(null, users[hash]);
+  } else {
+    users[hash] = accessToken;
+    return cb(new Error());
+  }
 });
 
 app.get("/login",
   passport.authenticate("oauth2"));
 
-app.get('/login/callback',
-  passport.authenticate('oauth2', { failureRedirect: '/login' }),
+app.get("/login/callback",
+  passport.authenticate("oauth2", { failureRedirect: "/login" }),
   (req, res) => {
     // Successful authentication, redirect home.
-    res.redirect('/');
+    res.redirect("/");
 });
 
 app.listen(process.env.PORT,
