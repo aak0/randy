@@ -43,7 +43,7 @@ passport.serializeUser((accessToken, cb) => {
   return cb(null, crypto.createHash("sha256").update(accessToken).digest("base64"));
 });
 
-passport.deserializeUser((id, cb) => {
+passport.deserializeUser((hash, cb) => {
   if (typeof users[hash] !== "undefined") {
     return cb(null, users[hash]);
   } else {
