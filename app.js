@@ -49,6 +49,12 @@ passport.deserializeUser((id, cb) => {
 app.get("/login",
   passport.authenticate("oauth2"));
 
+app.get("/repos", 
+  passport.authenticate("oauth2", { failureRedirect: "/login" }),
+  (req, res) => {
+    res.send("Hello, authenticated user!");
+});
+
 app.get("/login/callback",
   passport.authenticate("oauth2", { failureRedirect: "/login" }),
   (req, res) => {
