@@ -23,7 +23,7 @@ passport.use(new OAuth2Strategy({
 (accessToken, refreshToken, profile, cb) => {
   const hash = crypto.createHash("sha256").update(accessToken).digest("base64");
   console.log(hash);
-  if (users[hash] !== "undefined") {
+  if (typeof users[hash] !== "undefined") {
     console.log("stored token", users[hash]);
     return cb(null, users[hash]);
   } else {
@@ -38,7 +38,7 @@ passport.serializeUser((accessToken, cb) => {
 });
 
 passport.deserializeUser((id, cb) => {
-  if (users[hash] !== "undefined") {
+  if (typeof users[hash] !== "undefined") {
     return cb(null, users[hash]);
   } else {
     users[hash] = accessToken;
