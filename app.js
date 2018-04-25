@@ -13,7 +13,7 @@ passport.use(new OAuth2Strategy({
   tokenURL: "https://github.com/login/oauth/access_token",
   clientID: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET,
-  callbackURL: `${process.env.URL}/auth/example/callback`
+  callbackURL: `${process.env.URL}/login/callback`
 },
 (accessToken, refreshToken, profile, cb) => {
   User.findOrCreate({ exampleId: profile.id }, (err, user) => {
