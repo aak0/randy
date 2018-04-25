@@ -24,6 +24,7 @@ passport.use(new OAuth2Strategy({
   const hash = crypto.createHash("sha256").update(accessToken).digest("base64");
   console.log(hash);
   if (users[hash] !== "undefined") {
+    console.log("stored token", users[hash]);
     return cb(null, users[hash]);
   } else {
     users[hash] = accessToken;
@@ -33,10 +34,10 @@ passport.use(new OAuth2Strategy({
 ));
 
 passport.serializeUser((accessToken, cb) => {
-  cb(null, crypto.createHash("sha256").update(accessToken).digest("base64"));
+  return cb(null, crypto.createHash("sha256").update(accessToken).digest("base64"));
 });
 
-passport.deserializeUser((id, done) => {
+passport.deserializeUser((id, cb) => {
   if (users[hash] !== "undefined") {
     return cb(null, users[hash]);
   } else {
