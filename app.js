@@ -21,7 +21,8 @@ passport.use(new OAuth2Strategy({
   // User.findOrCreate({ exampleId: profile.id }, (err, user) => {
   //   return cb(err, user);
   // });
-  return cb(null, {id: "abcd"});
+  console.log(JSON.stringify(profile));
+  return cb(null, {id: profile.id});
 }
 ));
 
