@@ -103,14 +103,19 @@ passport.use(new OAuth2Strategy({
     // Normalise the id to make changing / adding providers easier
     const idHash = crypto.createHash("sha256").update(`${provider}/${id}`).digest("hex");
 
-    if (!users[idHash]) {
-      console.log("No user with hash", idHash)
-      users[idHash] = { accessToken, id, provider };
-      cb(null, { accessToken, id, provider });
-    } else {
-      console.log("Found user", JSON.stringify(users[idHash]));
-      cb(null, users[idHash]);
-    }
+    db.findOne({ idHash }, (err, user) => {
+      if (!err) {
+        console.log("Found user", JSON.stringify(user));
+        cb(null, user);
+      } else {
+        db.insert({ idHash, accessToken, id, provider }, 
+          (err, user) => {
+            if (!err) {
+              cb(null, user);
+            }
+          });
+      }
+    })
   });
 }
 ));
@@ -120,11 +125,13 @@ passport.serializeUser((user, cb) => {
 });
 
 passport.deserializeUser((idHash, cb) => {
-  if (!users[idHash]) {
-    cb(new Error());
-  } else {
-    cb(null, users[idHash]);
-  }
+  db.findOne({ idHash }, (err, user) => {
+    if (!err) {
+      cb(null, user)
+    } else {
+      cb(err);
+    }
+  });
 });
 
 app.use(function proceedOrLogin(req, res, next) {
