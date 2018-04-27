@@ -135,12 +135,14 @@ app.get("/repos",
 app.get("/starred",
   (req, res) => {
     github.getStarred(req.user, (starred) => {
-      console.log("HEADERS", JSON.stringify(req.headers));
-      if (req.headers["accept"].includes("text/html")) {
-        res.render("starred", { starred });
-      } else {
-        res.json(starred);
-      }
+      res.render("starred", { starred });
+    });
+});
+
+app.get("/starred.json",
+  (req, res) => {
+    github.getStarred(req.user, (starred) => {
+      res.json(starred);
     });
 });
 
