@@ -18,6 +18,9 @@ app.use(session({ secret: process.env.SESSION_SECRET }));
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.set("views", ".");
+app.set("view engine", "pug");
+
 let users = {};
 
 let github = {};
@@ -132,7 +135,9 @@ app.get("/repos",
 app.get("/starred",
   (req, res) => {
     github.getStarred(req.user, (starred) => {
-      console.log("Got some stars");
+      if (req.headers["Content-Type"] === "text/html") {
+        res.render("app", starred);
+      }
       res.json(starred);
     });
 });
