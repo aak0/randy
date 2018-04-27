@@ -48,6 +48,7 @@ passport.use(new OAuth2Strategy({
 (accessToken, refreshToken, profile, cb) => {
   github.getUser(accessToken, (userData) => {
     const id = userData.id;
+    const name = userData.name || userData.login;
     const provider = "github";
     // Normalise the id to make changing / adding providers easier
     const idHash = crypto.createHash("sha256").update(`${provider}/${id}`).digest("hex");
@@ -57,7 +58,7 @@ passport.use(new OAuth2Strategy({
         console.log("Found user", JSON.stringify(user));
         cb(null, user);
       } else {
-        db.insert({ idHash, accessToken, id, provider }, 
+        db.insert({ idHash, accessToken, id, provider, name }, 
           (err, user) => {
             if (!err) {
               cb(null, user);
@@ -98,7 +99,7 @@ app.get("/login",
 
 app.get("/", (req, res) => {
   if (req.user) {
-    res.render("index-logged-in");
+    res.render("index-logged-in", {name: req.user.name});
   } else {
     res.render("index");
   }
@@ -132,7 +133,7 @@ app.get("/starred",
       if (anyFive(starred) === 0) {
         res.render("alone");
       } else {
-        res.render("starred", { starred: anyFive(starred) });
+        res.render("starred", { starred: anyFive(starred), name: req.user.name});
       }
     });
 });
