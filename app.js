@@ -109,9 +109,9 @@ passport.deserializeUser((idHash, cb) => {
   }
 });
 
+const freePass = ["/", "/login", "/login/callback"];
 app.use(function proceedOrLogin(req, res, next) {
-  console.log("PATH", req.path);
-  if (req.user || req.path === "/") {
+  if (req.user || freePass.includes(req.path)) {
     return next(req, res);
   } else {
     req.session.backTo = req.path;
