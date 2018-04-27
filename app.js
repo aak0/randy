@@ -8,11 +8,12 @@ const crypto = require("crypto");
 const bodyParser = require("body-parser");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
-const request = require("request");
 const _ = require("lodash");
 const Datastore = require("nedb");
 const db = new Datastore({ filename: "users.db", autoload: true });
 const NedbStore = require("nedb-session-store")(session);
+
+const github = require("./github");
 
 app.use(helmet())
 app.use(express.static(path.join(__dirname, "public")));
@@ -37,57 +38,6 @@ app.set("views", "./views");
 app.set("view engine", "pug");
 
 let users = {};
-
-let github = {};
-github.getUser = function githubGetUser(accessTokenOrUser, cb) {
-  let accessToken;
-  if (typeof accessTokenOrUser === "string") {
-    accessToken = accessTokenOrUser;
-  } else {
-    accessToken = accessTokenOrUser.accessToken;
-  }
-  
-  request({
-    url: `https://api.github.com/user?access_token=${accessToken}`,
-    headers: {
-      "User-Agent": "request"
-    }
-  },(err, res, body) => {
-    if (!err && res.statusCode === 200) {
-      cb(JSON.parse(body));
-    }
-  });
-}
-
-github.getRepos = function githubGetRepos(user, cb) {
-  github.getUser(user, (userData) => {
-    request({
-      url: `${userData.repos_url}?access_token=${user.accessToken}`,
-      headers: {
-        "User-Agent": "request"
-      }
-    },(err, res, body) => {
-      if (!err && res.statusCode === 200) {
-        cb(JSON.parse(body));
-      }
-    });
-  });
-}
-
-github.getStarred = function githubGetStarred(user, cb) {
-  github.getUser(user, (userData) => {
-    request({
-      url: `https://api.github.com/user/starred?access_token=${user.accessToken}`,
-      headers: {
-        "User-Agent": "request"
-      }
-    },(err, res, body) => {
-      if (!err && res.statusCode === 200) {
-        cb(JSON.parse(body));
-      }
-    });
-  });
-}
 
 passport.use(new OAuth2Strategy({
   authorizationURL: "https://github.com/login/oauth/authorize",
