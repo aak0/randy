@@ -19,16 +19,16 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieParser());
 app.use(bodyParser());
 app.use(session({
-  store: new NedbStore({
-    filename: "session.db"
-  }),
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false, // Do not store cookies for guests
   cookie: {
     secure: true,
     maxAge: 1000 * 60 * 60 * 72, // 72 hours
-  }
+  },
+  store: new NedbStore({
+    filename: "session.db"
+  })
 }));
 app.use(passport.initialize());
 app.use(passport.session());
