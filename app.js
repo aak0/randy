@@ -109,19 +109,20 @@ passport.deserializeUser((idHash, cb) => {
   }
 });
 
+app.use(function proceedOrLogin(req, res, next) {
+  if (req.user || req.route === "/") return next(req, res);
+  req.session.backTo = req.route;
+  res.redirect("/login");
+});
+
 app.get("/login",
   passport.authenticate("oauth2"));
 
 app.get("/repos",
   (req, res) => {
-    if (req.user) {
-      github.getRepos(req.user, (repos) => {
-        res.json(repos);
-      });
-    } else {
-      req.session.backTo = "/repos";
-      res.redirect("/login");
-    }
+    github.getRepos(req.user, (repos) => {
+      res.json(repos);
+    });
 });
 
 app.get("/starred",
