@@ -136,8 +136,8 @@ app.get("/starred",
   (req, res) => {
     github.getStarred(req.user, (starred) => {
       console.log("HEADERS", JSON.stringify(req.headers));
-      if (req.headers) {
-        res.render("starred", starred)
+      if (req.headers["accept"].includes("text/html")) {
+        res.render("starred", { starred });
       } else {
         res.json(starred);
       }
