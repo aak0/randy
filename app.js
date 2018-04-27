@@ -110,7 +110,7 @@ passport.deserializeUser((idHash, cb) => {
 });
 
 app.use(function proceedOrLogin(req, res, next) {
-  const freePass = ["/", "/login", "/login/callback"];
+  const freePass = ["/", "/login"];
   if (req.user || freePass.includes(req.path)) {
     next();
   } else {
@@ -131,27 +131,17 @@ app.get("/repos",
 
 app.get("/starred",
   (req, res) => {
-    if (req.user) {
-      github.getStarred(req.user, (starred) => {
-        console.log("Got some stars");
-        res.json(starred);
-      });
-    } else {
-      req.session.backTo = "/starred";
-      res.redirect("/login");
-    }
+    github.getStarred(req.user, (starred) => {
+      console.log("Got some stars");
+      res.json(starred);
+    });
 });
 
 app.get("/user",
   (req, res) => {
-    if (req.user) {
-      github.getUser(req.user, (userData) => {
-        res.json(userData);
-      });
-    } else {
-      req.session.backTo = "/user";
-      res.redirect("/login");
-    }
+    github.getUser(req.user, (userData) => {
+      res.json(userData);
+    });
 });
 
 app.get("/login/callback",
