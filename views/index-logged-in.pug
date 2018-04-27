@@ -23,14 +23,16 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-dark.fixed-top
             span.sr-only (current)
         li.nav-item
           a.nav-link(href='/starred') Repos
+        li.nav-item
+          a.nav-link(href='/logout') Log Out
 // Page Content
 .container
   .row
     .col-lg-12.text-center
       h1.mt-5 Randy - see your starred repositories!
       p.lead Well, some of them... If you have any...
-      a(href='/login')
-        button.btn.btn-secondary.btn-lg(type='button') Log in with GitHub
+      a(href='/starred')
+        button.btn.btn-primary.btn-lg(type='button') Continue
 // Bootstrap core JavaScript
 script(src='/jquery.min.js')
 script(src='/bootstrap.bundle.min.js')
