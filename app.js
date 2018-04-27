@@ -10,7 +10,7 @@ const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const request = require("request");
 const _ = require("lodash");
-const Datastore = require("nedb")
+const Datastore = require("nedb");
 const db = new Datastore({ filename: "users.db", autoload: true });
 const NedbStore = require("nedb-session-store")(session);
 
@@ -23,7 +23,7 @@ app.use(session({
   resave: true,
   saveUninitialized: false, // Do not store cookies for guests
   cookie: {
-    secure: true,
+    secure: false,
     maxAge: 1000 * 60 * 60 * 72, // 72 hours
   },
   store: new NedbStore({
@@ -104,7 +104,7 @@ passport.use(new OAuth2Strategy({
     const idHash = crypto.createHash("sha256").update(`${provider}/${id}`).digest("hex");
 
     db.findOne({ idHash }, (err, user) => {
-      if (!err) {
+      if (!err && user) {
         console.log("Found user", JSON.stringify(user));
         cb(null, user);
       } else {
@@ -126,7 +126,7 @@ passport.serializeUser((user, cb) => {
 
 passport.deserializeUser((idHash, cb) => {
   db.findOne({ idHash }, (err, user) => {
-    if (!err) {
+    if (!err && user) {
       cb(null, user)
     } else {
       cb(err);
