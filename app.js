@@ -13,12 +13,63 @@ const request = require("request");
 app.use(helmet())
 app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieParser());
-//app.use(bodyParser());
+app.use(bodyParser());
 app.use(session({ secret: process.env.SESSION_SECRET }));
 app.use(passport.initialize());
 app.use(passport.session());
 
 let users = {};
+
+let github = {};
+github.getUser = function githubGetUser(accessTokenOrUser, cb) {
+  let accessToken;
+  if (typeof accessTokenOrUser === "string") {
+    accessToken = accessTokenOrUser;
+  } else {
+    accessToken = accessTokenOrUser.accessToken;
+  }
+  
+  request({
+    url: `https://api.github.com/user?access_token=${accessToken}`,
+    headers: {
+      "User-Agent": "request"
+    }
+  },(err, res, body) => {
+    if (!err && res.statusCode === 200) {
+      cb(JSON.parse(body));
+    }
+  });
+}
+
+github.getRepos = function githubGetRepos(user, cb) {
+  github.getUser(user, (userData) => {
+    request({
+      url: `${userData.repos_url}?access_token=${user.accessToken}`,
+      headers: {
+        "User-Agent": "request"
+      }
+    },(err, res, body) => {
+      if (!err && res.statusCode === 200) {
+        cb(JSON.parse(body));
+      }
+    });
+  });
+}
+
+github.getStarred = function githubGetStarred(user, cb) {
+  github.getUser(user, (userData) => {
+    request({
+      url: `https://api.github.com/user/starred?access_token=${user.accessToken}`,
+      headers: {
+        "User-Agent": "request"
+      }
+    },(err, res, body) => {
+      if (!err && res.statusCode === 200) {
+        cb(JSON.parse(body));
+      }
+    });
+  });
+}
 
 passport.use(new OAuth2Strategy({
   authorizationURL: "https://github.com/login/oauth/authorize",
@@ -28,44 +79,33 @@ passport.use(new OAuth2Strategy({
   callbackURL: `${process.env.URL}/login/callback`
 },
 (accessToken, refreshToken, profile, cb) => {
-  request({
-      url: `https://api.github.com/user?access_token=${accessToken}`,
-      headers: {
-        "User-Agent": "request"
-      }
-    },
-    (err, res, body) => {
-      if (!err && res.statusCode === 200) {
-        console.log("got something")
-        const id = JSON.parse(body).id;
-        const provider = "github";
-        // Normalise the id to make changing / adding providers easier
-        const idHash = crypto.createHash("sha256").update(`${provider}/${id}`).digest("hex");
-  
-        if (!users[idHash]) {
-          console.log("No user with hash", idHash)
-          users[idHash] = { accessToken, id, provider };
-          return cb({ accessToken, id, provider });
-        } else {
-          console.log("Found user", JSON.stringify(users[idHash]));
-          return cb(users[idHash]);
-        }
-      }
-    });
+  github.getUser(accessToken, (userData) => {
+    const id = userData.id;
+    const provider = "github";
+    // Normalise the id to make changing / adding providers easier
+    const idHash = crypto.createHash("sha256").update(`${provider}/${id}`).digest("hex");
+
+    if (!users[idHash]) {
+      console.log("No user with hash", idHash)
+      users[idHash] = { accessToken, id, provider };
+      cb(null, { accessToken, id, provider });
+    } else {
+      console.log("Found user", JSON.stringify(users[idHash]));
+      cb(null, users[idHash]);
+    }
+  });
 }
 ));
 
 passport.serializeUser((user, cb) => {
-  console.log("serialising", JSON.stringify(user));
-  return cb(null, crypto.createHash("sha256").update(`${user.provider}/${user.id}`).digest("hex"));
+  cb(null, crypto.createHash("sha256").update(`${user.provider}/${user.id}`).digest("hex"));
 });
 
 passport.deserializeUser((idHash, cb) => {
-  console.log("deserialising", JSON.stringify(idHash));
   if (!users[idHash]) {
-    return cb(new Error('hello'));
+    cb(new Error());
   } else {
-    return cb(null, users[idHash]);
+    cb(null, users[idHash]);
   }
 });
 
@@ -74,16 +114,49 @@ app.get("/login",
 
 app.get("/repos",
   (req, res) => {
-    res.json(req.user);
+    if (req.user) {
+      github.getRepos(req.user, (repos) => {
+        res.json(repos);
+      });
+    } else {
+      req.session.backTo = "/repos";
+      res.redirect("/login");
+    }
+});
+
+app.get("/starred",
+  (req, res) => {
+    if (req.user) {
+      github.getStarred(req.user, (starred) => {
+        console.log("Got some stars");
+        res.json(starred);
+      });
+    } else {
+      req.session.backTo = "/starred";
+      res.redirect("/login");
+    }
+});
+
+app.get("/user",
+  (req, res) => {
+    if (req.user) {
+      github.getUser(req.user, (userData) => {
+        res.json(userData);
+      });
+    } else {
+      req.session.backTo = "/user";
+      res.redirect("/login");
+    }
 });
 
 app.get("/login/callback",
   passport.authenticate("oauth2", { failureRedirect: "/login" }),
+  // Successful authentication, redirect back.
   (req, res) => {
-    // Successful authentication, redirect home.
-    console.log(req.session);
-    res.redirect("/");
-});
+    res.redirect(req.session.backTo || "/");
+    req.session.backTo = "";
+  }
+);
 
 app.listen(process.env.PORT,
   () => console.log(`Example app listening on port ${process.env.PORT}`));
