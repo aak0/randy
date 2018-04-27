@@ -134,6 +134,7 @@ app.get("/repos",
 });
 
 app.get("/", (req, res) => {
+  console.log(JSON.stringify(req.user));
   res.render("index");
 });
 
