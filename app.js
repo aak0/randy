@@ -134,8 +134,11 @@ app.get("/repos",
 });
 
 app.get("/", (req, res) => {
-  console.log(JSON.stringify(req.user));
-  res.render("index");
+  if (req.user) {
+    res.render("index-logged-in");
+  } else {
+    res.render("index");
+  }
 });
 
 app.get("/logout", (req, res) => {
