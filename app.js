@@ -135,7 +135,8 @@ app.get("/repos",
 app.get("/starred",
   (req, res) => {
     github.getStarred(req.user, (starred) => {
-      if (req.headers["Content-Type"] === "text/html") {
+      console.log("HEADERS", JSON.stringify(req.headers));
+      if (req.headers) {
         res.render("starred", starred)
       } else {
         res.json(starred);
