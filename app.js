@@ -110,11 +110,11 @@ passport.deserializeUser((idHash, cb) => {
 });
 
 app.use(function proceedOrLogin(req, res, next) {
-  console.log("ROUTE", req.route);
-  if (req.user || req.route === "/") {
+  console.log("PATH", req.path);
+  if (req.user || req.path === "/") {
     return next(req, res);
   } else {
-    req.session.backTo = req.route;
+    req.session.backTo = req.path;
     res.redirect("/login");
   }
 });
