@@ -133,6 +133,10 @@ app.get("/repos",
     });
 });
 
+app.get("/", (req, res) => {
+  res.render(index);
+});
+
 app.get("/starred",
   (req, res) => {
     function anyFive(xs) {

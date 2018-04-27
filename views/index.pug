@@ -1,0 +1,35 @@
+doctype html
+head
+  meta(charset='utf-8')
+  meta(name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no')
+  meta(name='description' content='')
+  meta(name='author' content='')
+  title Bare - Start Bootstrap Template
+  // Bootstrap core CSS
+  link(href='/bootstrap.min.css' rel='stylesheet')
+  link(href='/round-about.css' rel='stylesheet')
+
+// Navigation
+nav.navbar.navbar-expand-lg.navbar-dark.bg-dark.fixed-top
+  .container
+    a.navbar-brand(href='/') Randy
+    button.navbar-toggler(type='button' data-toggle='collapse' data-target='#navbarResponsive' aria-controls='navbarResponsive' aria-expanded='false' aria-label='Toggle navigation')
+      span.navbar-toggler-icon
+    #navbarResponsive.collapse.navbar-collapse
+      ul.navbar-nav.ml-auto
+        li.nav-item.active
+          a.nav-link(href='/')
+            | Home
+            span.sr-only (current)
+        li.nav-item
+          a.nav-link(href='/starred') Repos
+// Page Content
+.container
+  .row
+    .col-lg-12.text-center
+      h1.mt-5 Randy - see your starred repositories!
+      p.lead Well, some of them... If you have any...
+      button.btn.btn-primary.btn-lg(type='button') Log in with GitHub
+// Bootstrap core JavaScript
+script(src='/jquery.min.js')
+script(src='/bootstrap.bundle.min.js')
