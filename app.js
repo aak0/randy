@@ -18,7 +18,7 @@ app.use(session({ secret: process.env.SESSION_SECRET }));
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.set("views", ".");
+app.set("views", "./views");
 app.set("view engine", "pug");
 
 let users = {};
@@ -113,7 +113,7 @@ passport.deserializeUser((idHash, cb) => {
 });
 
 app.use(function proceedOrLogin(req, res, next) {
-  const freePass = ["/", "/login"];
+  const freePass = ["/", "/login", "/login/callback"];
   if (req.user || freePass.includes(req.path)) {
     next();
   } else {
