@@ -20,6 +20,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieParser());
 app.use(bodyParser());
 app.use(session({
+  name: "session",
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false, // Do not store cookies for guests
