@@ -137,6 +137,11 @@ app.get("/", (req, res) => {
   res.render("index");
 });
 
+app.get("/logout", (req, res) => {
+  req.logout();
+  res.redirect("/");
+});
+
 app.get("/starred",
   (req, res) => {
     function anyFive(xs) {
