@@ -9,6 +9,7 @@ const bodyParser = require("body-parser");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const request = require("request");
+const _ = require("lodash");
 
 app.use(helmet())
 app.use(express.static(path.join(__dirname, "public")));
@@ -134,8 +135,29 @@ app.get("/repos",
 
 app.get("/starred",
   (req, res) => {
+    function anyFive(xs) {
+      if (xs.length === 0) return xs;
+      if (xs.length === 5) return _.shuffle(xs);
+      if (xs.length > 5) {
+        return _.sampleSize(xs, 5);
+      } else {
+        // Pad the array to length 5 while randomising the order
+        // [1, 2] -> 3
+        const factor = Math.ceil(5 / xs.length);
+        // [_, _, _] -> [1, 2, 1, 2, 1, 2]
+        const padded = Array(factor).reduce((accum) => {
+          accum.concat(xs);
+        }, []);
+        // [1, 2, 1, 2, 1, 2] -> ~~[2, 2, 1, 2, 1]
+        return _.sampleSize(padded, 5);
+      }
+    }
     github.getStarred(req.user, (starred) => {
-      res.render("starred", { starred });
+      if (anyFive(starred) === 0) {
+        res.render("alone");
+      } else {
+        res.render("starred", { anyFive(starred) });
+      }
     });
 });
 
