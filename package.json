@@ -17,6 +17,8 @@
     "express-session": "^1.15.6",
     "helmet": "^3.12.0",
     "lodash": "^4.17.10",
+    "nedb": "^1.8.0",
+    "nedb-session-store": "^1.1.2",
     "passport": "^0.4.0",
     "passport-oauth2": "^1.4.0",
     "pug": "^2.0.3",

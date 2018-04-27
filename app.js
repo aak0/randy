@@ -10,12 +10,26 @@ const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const request = require("request");
 const _ = require("lodash");
+const Datastore = require("nedb")
+const db = new Datastore({ filename: "users.db", autoload: true });
+const NedbStore = require("nedb-session-store")(session);
 
 app.use(helmet())
 app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieParser());
-app.use(bodyParser());
-app.use(session({ secret: process.env.SESSION_SECRET }));
+// app.use(bodyParser());
+app.use(session({
+  store: new NedbStore({
+    filename: "session.db"
+  }),
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false, // Do not store cookies for guests
+  cookie: {
+    secure: true,
+    maxAge: 1000 * 60 * 60 * 72, // 72 hours
+  }
+}));
 app.use(passport.initialize());
 app.use(passport.session());
 
