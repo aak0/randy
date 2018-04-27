@@ -37,8 +37,6 @@ app.use(passport.session());
 app.set("views", "./views");
 app.set("view engine", "pug");
 
-let users = {};
-
 passport.use(new OAuth2Strategy({
   authorizationURL: "https://github.com/login/oauth/authorize",
   tokenURL: "https://github.com/login/oauth/access_token",
@@ -97,13 +95,6 @@ app.use(function proceedOrLogin(req, res, next) {
 app.get("/login",
   passport.authenticate("oauth2"));
 
-app.get("/repos",
-  (req, res) => {
-    github.getRepos(req.user, (repos) => {
-      res.json(repos);
-    });
-});
-
 app.get("/", (req, res) => {
   if (req.user) {
     res.render("index-logged-in");
@@ -149,13 +140,6 @@ app.get("/starred.json",
   (req, res) => {
     github.getStarred(req.user, (starred) => {
       res.json(starred);
-    });
-});
-
-app.get("/user",
-  (req, res) => {
-    github.getUser(req.user, (userData) => {
-      res.json(userData);
     });
 });
 
