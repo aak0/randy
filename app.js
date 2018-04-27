@@ -20,7 +20,7 @@ app.use(cookieParser());
 app.use(bodyParser());
 app.use(session({
   secret: process.env.SESSION_SECRET,
-  resave: false,
+  resave: true,
   saveUninitialized: false, // Do not store cookies for guests
   cookie: {
     secure: true,
