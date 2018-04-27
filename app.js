@@ -156,7 +156,7 @@ app.get("/starred",
       if (anyFive(starred) === 0) {
         res.render("alone");
       } else {
-        res.render("starred", { anyFive(starred) });
+        res.render("starred", { starred: anyFive(starred) });
       }
     });
 });
