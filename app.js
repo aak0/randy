@@ -15,7 +15,7 @@ const NedbStore = require("nedb-session-store")(session);
 
 const github = require("./github");
 
-app.use(helmet())
+app.use(helmet());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieParser());
 app.use(bodyParser());
