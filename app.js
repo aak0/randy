@@ -24,7 +24,7 @@ app.use(session({
   resave: true,
   saveUninitialized: false, // Do not store cookies for guests
   cookie: {
-    secure: false,
+    secure: true,
     maxAge: 1000 * 60 * 60 * 72, // 72 hours
   },
   store: new NedbStore({
