@@ -110,6 +110,7 @@ passport.deserializeUser((idHash, cb) => {
 });
 
 app.use(function proceedOrLogin(req, res, next) {
+  console.log("ROUTE", req.route);
   if (req.user || req.route === "/") {
     return next(req, res);
   } else {
