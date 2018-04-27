@@ -36,12 +36,10 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-dark.fixed-top
     .col-lg-12
       h2.my-4 Starred repositories
     .col-lg-4.col-sm-6.text-center.mb-4
-      img.rounded-circle.img-fluid.d-block.mx-auto(src='http://placehold.it/200x200' alt='')
-      h3
-        | #{starred[0].name}
-        small Job Title
+      img.rounded-circle.img-fluid.d-block.mx-auto(src='#{starred[0].owner.avatar_url}' alt='')
+      h3 #{starred[0].name}
       p
-        | What does this team member to? Keep it short! This is also a great spot for social links!
+        | #{starred[0].language}
     .col-lg-4.col-sm-6.text-center.mb-4
       img.rounded-circle.img-fluid.d-block.mx-auto(src='http://placehold.it/200x200' alt='')
       h3
